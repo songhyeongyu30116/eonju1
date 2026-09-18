@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>온도주권 | 우리반 온도 맞춤 시스템</title>
+
+  <!-- 토스 표준 폰트: Pretendard -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <style>
+    /* =========================================================
+       [디자인 시스템] 토스(Toss) 앱 시그니처 스타일링
+       ========================================================= */
+    :root {
+      --toss-blue: #3182F6;
+      --toss-blue-light: #E8F3FF;
+      --toss-red: #F04452;
+      --toss-red-light: #FEEFEF;
+      --toss-green: #20C997;
+      --toss-green-light: #E6FCF5;
+      
+      --gray-900: #191F28;
+      --gray-800: #333D4B;
+      --gray-700: #4E5968;
+      --gray-600: #6B7684;
+      --gray-500: #8B95A1;
+      --gray-400: #B0B8C1;
+      --gray-300: #D1D6DB;
+      --gray-200: #E5E8EB;
+      --gray-100: #F2F4F6;
+      --gray-50:  #F9FAFB;
+      --white:    #FFFFFF;
+
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.08);
+
+      --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--gray-100);
+      color: var(--gray-900);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* 토스 모바일 뷰 컨테이너 */
+    .app-container {
+      width: 100%;
+      max-width: 440px;
+      background-color: var(--gray-100);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 20px 20px 100px 20px;
+      box-sizing: border-box;
+    }
+
+    /* ---------------------------------------------------------
+       1. 헤더 영역 (서비스명 & 상태 표시)
+       --------------------------------------------------------- */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 4px 20px 4px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--toss-blue);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: var(--gray-900);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background-color: #E8F3FF;
+      color: var(--toss-blue);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--toss-blue);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* ---------------------------------------------------------
+       2. 대문짝 결과 디스플레이 카드리프팅 (가장 크게)
+       --------------------------------------------------------- */
+    .hero-result-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 28px 24px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.02);
+    }
+
+    /* 상태별 배경 및 테두리 트랜지션 효과 */
+    .hero-result-card.state-hot {
+      background: linear-gradient(180deg, #FFF5F5 0%, #FFFFFF 100%);
+      border: 2px solid var(--toss-red);
+    }
+
+    .hero-result-card.state-cold {
+      background: linear-gradient(180deg, #F0F7FF 0%, #FFFFFF 100%);
+      border: 2px solid var(--toss-blue);
+    }
+
+    .hero-result-card.state-equal {
+      background: linear-gradient(180deg, #F2FDF9 0%, #FFFFFF 100%);
+      border: 2px solid var(--toss-green);
+    }
+
+    .result-sub-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-600);
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    /* 대문짝 결과 텍스트 */
+    .result-main-title {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1.2px;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      transition: var(--transition-smooth);
+    }
+
+    .result-main-title.text-hot { color: var(--toss-red); }
+    .result-main-title.text-cold { color: var(--toss-blue); }
+    .result-main-title.text-equal { color: var(--toss-green); }
+
+    .result-description {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--gray-700);
+      line-height: 1.45;
+      margin-bottom: 18px;
+      word-break: keep-all;
+    }
+
+    /* 실시간 득표율 프로그레스 바 */
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      background-color: var(--gray-200);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      margin-top: 14px;
+    }
+
+    .progress-hot {
+      height: 100%;
+      background-color: var(--toss-red);
+      width: 50%;
+      transition: width 0.4s ease;
+    }
+
+    .progress-cold {
+      height: 100%;
+      background-color: var(--toss-blue);
+      width: 50%;
+      transition: width 0.4s ease;
+    }
+
+    .vote-percentage-text {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .percentage-hot-text { color: var(--toss-red); }
+    .percentage-cold-text { color: var(--toss-blue); }
+
+    /* ---------------------------------------------------------
+       3. 투표 버튼 섹션 (토스 카드 클릭 감성)
+       --------------------------------------------------------- */
+    .vote-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin: 8px 4px 12px 4px;
+      letter-spacing: -0.3px;
+    }
+
+    .vote-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .vote-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition-smooth);
+      position: relative;
+      outline: none;
+    }
+
+    .vote-card:active {
+      transform: scale(0.95);
+      background-color: var(--gray-50);
+    }
+
+    .vote-card.hot-card {
+      border-color: rgba(240, 68, 82, 0.12);
+    }
+    .vote-card.hot-card:hover {
+      border-color: var(--toss-red);
+    }
+
+    .vote-card.cold-card {
+      border-color: rgba(49, 130, 246, 0.12);
+    }
+    .vote-card.cold-card:hover {
+      border-color: var(--toss-blue);
+    }
+
+    .vote-emoji {
+      font-size: 40px;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+    }
+
+    .vote-label {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+
+    .vote-count-badge {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-top: 4px;
+    }
+
+    .hot-card .vote-count-badge { color: var(--toss-red); }
+    .cold-card .vote-count-badge { color: var(--toss-blue); }
+
+    .click-hint {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* ---------------------------------------------------------
+       4. 최적 온도 추론 및 데이터 분석 카드
+       --------------------------------------------------------- */
+    .analysis-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .analysis-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .analysis-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gray-800);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .analysis-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--toss-blue);
+    }
+
+    .analysis-detail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .analysis-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 8px 12px;
+      background-color: var(--gray-100);
+      border-radius: var(--radius-md);
+    }
+
+    .analysis-item-title {
+      color: var(--gray-600);
+      font-weight: 500;
+    }
+
+    .analysis-item-value {
+      color: var(--gray-900);
+      font-weight: 700;
+    }
+
+    /* ---------------------------------------------------------
+       5. 리셋 및 투표 운영 제어 버튼 (학급용)
+       --------------------------------------------------------- */
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background-color: var(--gray-200);
+      color: var(--gray-700);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      text-align: center;
+    }
+
+    .btn-secondary:active {
+      background-color: var(--gray-300);
+      transform: scale(0.98);
+    }
+
+    /* ---------------------------------------------------------
+       6. 화면 우측 하단 에너지를 위한 고정 미니 팁 (Energy Tip)
+       --------------------------------------------------------- */
+    .energy-floating-tip {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      max-width: 280px;
+      background: var(--gray-900);
+      color: var(--white);
+      padding: 12px 16px;
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 99;
+      animation: floatSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes floatSlideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .tip-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .tip-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tip-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--toss-green);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tip-desc {
+      font-size: 12px;
+      font-weight: 500;
+      color: #E5E8EB;
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+    /* 토스 스타일 유틸리티 */
+    .toast-msg {
+      position: fixed;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background-color: rgba(25, 31, 40, 0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 토스트 알림 메시지 -->
+  <div id="toast" class="toast-msg">투표가 반영되었습니다!</div>
+
+  <div class="app-container">
+    
+    <!-- 1. 앱 헤더 -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">℃</div>
+        <div class="brand-title">온도주권</div>
+      </div>
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span id="recessTimer">쉬는시간 실시간</span>
+      </div>
+    </header>
+
+    <!-- 2. 핵심 대문짝 결과 표시 영역 -->
+    <section id="heroCard" class="hero-result-card state-equal">
+      <div class="result-sub-label">우리반 현재 실시간 결론</div>
+      
+      <!-- 대문짝 결과 텍스트 -->
+      <h1 id="resultMainTitle" class="result-main-title text-equal">
+        지금 딱 좋아요! 🌿
+      </h1>
+      
+      <!-- 결과 상세 설명 문구 -->
+      <p id="resultDescription" class="result-description">
+        더위와 추위 투표가 팽팽합니다.<br>현재 교실 온도를 유지해보세요.
+      </p>
+
+      <!-- 실시간 득표 비율 바 -->
+      <div class="progress-bar-container">
+        <div id="progressHot" class="progress-hot"></div>
+        <div id="progressCold" class="progress-cold"></div>
+      </div>
+
+      <div class="vote-percentage-text">
+        <span class="percentage-hot-text">더워요 <span id="percentHot">50</span>%</span>
+        <span class="percentage-cold-text">추워요 <span id="percentCold">50</span>%</span>
+      </div>
+    </section>
+
+    <!-- 3. 실시간 투표 섹션 -->
+    <div class="vote-section-title">쉬는시간 투표 참여하기</div>
+    <section class="vote-grid">
+      
+      <!-- 더워요 버튼 -->
+      <button class="vote-card hot-card" onclick="castVote('hot')" aria-label="더워요 투표">
+        <div class="vote-emoji">🥵</div>
+        <div class="vote-label">더워요</div>
+        <div id="countHot" class="vote-count-badge">0명</div>
+        <div class="click-hint">터치하여 +1</div>
+      </button>
+
+      <!-- 추워요 버튼 -->
+      <button class="vote-card cold-card" onclick="castVote('cold')" aria-label="추워요 투표">
+        <div class="vote-emoji">🥶</div>
+        <div class="vote-label">추워요</div>
+        <div id="countCold" class="vote-count-badge">0명</div>
+        <div class="click-hint">터치하여 +1</div>
+      </button>
+
+    </section>
+
+    <!-- 4. 최적 온도 추론 알고리즘 카드 -->
+    <section class="analysis-card">
+      <div class="analysis-header">
+        <div class="analysis-title">
+          <span>🧠 최적 온도 추론 알고리즘</span>
+        </div>
+        <div id="targetTemp" class="analysis-value">24.0°C</div>
+      </div>
+      
+      <div class="analysis-detail-list">
+        <div class="analysis-item">
+          <span class="analysis-item-title">총 투표 참여 인원</span>
+          <span id="totalVoters" class="analysis-item-value">0명</span>
+        </div>
+        <div class="analysis-item">
+          <span class="analysis-item-title">권장 에어컨/히터 조치</span>
+          <span id="recommendedAction" class="analysis-item-value">현재 상태 유지</span>
+        </div>
+        <div class="analysis-item">
+          <span class="analysis-item-title">반 학급 쾌적도 지수</span>
+          <span id="comfortIndex" class="analysis-item-value">100% (최적)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 학급 운영 버튼 -->
+    <div class="action-row">
+      <button class="btn-secondary" onclick="resetVotes()">다음 쉬는시간 초기화</button>
+      <button class="btn-secondary" onclick="shareSummary()">결과 요약 복사</button>
+    </div>
+
+  </div>
+
+  <!-- 6. 화면 우측 하단 에너지를 위한 작은 팁 (Energy Tip) -->
+  <div class="energy-floating-tip">
+    <div class="tip-icon">💡</div>
+    <div class="tip-content">
+      <div class="tip-title">에너지 최적화 TIP</div>
+      <div id="energyTipText" class="tip-desc">
+        냉방 시 설정 온도 1℃를 올리면 약 6%의 전기를 아낄 수 있어요!
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       [알고리즘 및 인터랙션 자바스크립트 코드]
+       ========================================================= -->
+  <script>
+    // 1. 투표 상태 데이터 (홈페이지 내 동작)
+    let state = {
+      hotCount: 0,
+      coldCount: 0,
+      baseTemp: 24.0 // 표준 기준 온도
+    };
+
+    // 에너지 절약 팁 로테이션 데이터
+    const energyTips = [
+      "냉방 시 설정 온도 1℃를 올리면 약 6%의 전기를 아낄 수 있어요!",
+      "쉬는시간 5분 환기는 교실 내 이산화탄소를 낮춰 집중력을 높여요.",
+      "에어컨 바람 날개를 위쪽으로 향하게 하면 교실 전체가 더 빨리 시원해집니다.",
+      "사용하지 않는 교실 전열기구 코드를 뽑으면 대기전력이 절감됩니다.",
+      "선풍기를 에어컨과 함께 틀면 순환 효과로 2℃ 더 시원하게 느껴져요!"
+    ];
+
+    let currentTipIndex = 0;
+
+    // 2. 투표하기 기능 (클릭 시 +1)
+    function castVote(type) {
+      if (type === 'hot') {
+        state.hotCount++;
+      } else if (type === 'cold') {
+        state.coldCount++;
+      }
+
+      // 화면 업데이트
+      updateUI();
+      showToast(type === 'hot' ? '🔥 더워요 투표 반영!' : '🧊 추워요 투표 반영!');
+      rotateEnergyTip();
+    }
+
+    // 3. 메인 알고리즘: 결과 및 최적 온도 계산 Logic
+    function updateUI() {
+      const { hotCount, coldCount, baseTemp } = state;
+      const total = hotCount + coldCount;
+
+      // 엘리먼트 참조
+      const countHotEl = document.getElementById('countHot');
+      const countColdEl = document.getElementById('countCold');
+      const percentHotEl = document.getElementById('percentHot');
+      const percentColdEl = document.getElementById('percentCold');
+      const progressHotEl = document.getElementById('progressHot');
+      const progressColdEl = document.getElementById('progressCold');
+      
+      const heroCard = document.getElementById('heroCard');
+      const resultMainTitle = document.getElementById('resultMainTitle');
+      const resultDescription = document.getElementById('resultDescription');
+      
+      const totalVotersEl = document.getElementById('totalVoters');
+      const targetTempEl = document.getElementById('targetTemp');
+      const recommendedActionEl = document.getElementById('recommendedAction');
+      const comfortIndexEl = document.getElementById('comfortIndex');
+
+      // (1) 카운트 갱신
+      countHotEl.innerText = `${hotCount}명`;
+      countColdEl.innerText = `${coldCount}명`;
+      totalVotersEl.innerText = `${total}명`;
+
+      // (2) 비율 계산
+      let hotPercent = 50;
+      let coldPercent = 50;
+
+      if (total > 0) {
+        hotPercent = Math.round((hotCount / total) * 100);
+        coldPercent = 100 - hotPercent;
+      }
+
+      percentHotEl.innerText = hotPercent;
+      percentColdEl.innerText = coldPercent;
+      progressHotEl.style.width = `${hotPercent}%`;
+      progressColdEl.style.width = `${coldPercent}%`;
+
+      // (3) 최적 온도 추론 알고리즘
+      // 더워요 1표당 -0.3℃ 조절 필요, 추워요 1표당 +0.3℃ 조절 필요
+      const tempDiff = ((coldCount - hotCount) * 0.3).toFixed(1);
+      const calculatedTargetTemp = (baseTemp + parseFloat(tempDiff)).toFixed(1);
+      targetTempEl.innerText = `${calculatedTargetTemp}°C`;
+
+      // (4) 승패 산출 및 대문짝 결과 연출
+      // 초기 상태 (투표 0개) 또는 동점일 때
+      if (hotCount === coldCount) {
+        heroCard.className = "hero-result-card state-equal";
+        resultMainTitle.className = "result-main-title text-equal";
+        
+        if (total === 0) {
+          resultMainTitle.innerText = "투표 대기 중 🗳️";
+          resultDescription.innerHTML = "쉬는시간입니다! 지금 더운지 추운지<br>아래 버튼을 눌러 투표해 주세요.";
+          recommendedActionEl.innerText = "투표 수집 중";
+          comfortIndexEl.innerText = " 측정 대기";
+        } else {
+          resultMainTitle.innerText = "지금 딱 좋아요! 🌿";
+          resultDescription.innerHTML = `더위와 추위 표수가 <b>${hotCount}:${coldCount}</b>로 동일합니다.<br>현재 교실 설정을 유지하는 것을 권장합니다.`;
+          recommendedActionEl.innerText = "현재 설정 유지";
+          comfortIndexEl.innerText = "95% (완벽함)";
+        }
+      } 
+      // [더워요 우세] -> 빨간색 대문짝 결과
+      else if (hotCount > coldCount) {
+        heroCard.className = "hero-result-card state-hot";
+        resultMainTitle.className = "result-main-title text-hot";
+        
+        const diff = hotCount - coldCount;
+        resultMainTitle.innerText = "더워요! 에어컨 UP 🥵";
+        
+        resultDescription.innerHTML = `<b>${diff}명</b>의 학생이 더위를 느끼고 있어요!<br>에어컨 온도를 <b>${Math.min(Math.ceil(diff * 0.5), 3)}℃ 낮추거나</b> 바람을 늘려주세요.`;
+        
+        recommendedActionEl.innerText = `에어컨 -${Math.min(Math.ceil(diff * 0.5), 3)}℃ 희망`;
+        
+        const comfort = Math.max(100 - (hotPercent - 50) * 1.5, 20).toFixed(0);
+        comfortIndexEl.innerText = `${comfort}% (불쾌지수 상승)`;
+      } 
+      // [추워요 우세] -> 파란색 대문짝 결과
+      else {
+        heroCard.className = "hero-result-card state-cold";
+        resultMainTitle.className = "result-main-title text-cold";
+        
+        const diff = coldCount - hotCount;
+        resultMainTitle.innerText = "추워요! 에어컨 OFF 🥶";
+        
+        resultDescription.innerHTML = `<b>${diff}명</b>의 학생이 추위를 느끼고 있어요!<br>에어컨/히터를 조절하거나 <b>바람 방향을 위로</b> 올려주세요.`;
+        
+        recommendedActionEl.innerText = `에어컨 +${Math.min(Math.ceil(diff * 0.5), 3)}℃ 또는 약풍`;
+        
+        const comfort = Math.max(100 - (coldPercent - 50) * 1.5, 20).toFixed(0);
+        comfortIndexEl.innerText = `${comfort}% (쌀쌀함)`;
+      }
+    }
+
+    // 4. 다음 쉬는시간 리셋 기능
+    function resetVotes() {
+      if (confirm("다음 쉬는시간을 위해 투표 데이터를 초기화할까요?")) {
+        state.hotCount = 0;
+        state.coldCount = 0;
+        updateUI();
+        showToast("투표가 깔끔하게 초기화되었습니다!");
+      }
+    }
+
+    // 5. 결과 요약 클립보드 복사
+    function shareSummary() {
+      const total = state.hotCount + state.coldCount;
+      if (total === 0) {
+        showToast("아직 투표 데이터가 없습니다.");
+        return;
+      }
+      
+      let winnerText = state.hotCount > state.coldCount ? "🔥 더워요 우세" : (state.coldCount > state.hotCount ? "🧊 추워요 우세" : "🌿 적당함");
+      const summaryText = `[온도주권 실시간 결과]\n- 참여: ${total}명 (더워요 ${state.hotCount} / 추워요 ${state.coldCount})\n- 결과: ${winnerText}\n- 추천 조치: ${document.getElementById('recommendedAction').innerText}`;
+
+      navigator.clipboard.writeText(summaryText).then(() => {
+        showToast("학급 결과 요약이 복사되었습니다!");
+      }).catch(() => {
+        showToast("복사 권한이 필요합니다.");
+      });
+    }
+
+    // 6. 에너지 팁 자동 변경 알고리즘
+    function rotateEnergyTip() {
+      currentTipIndex = (currentTipIndex + 1) % energyTips.length;
+      document.getElementById('energyTipText').innerText = energyTips[currentTipIndex];
+    }
+
+    // 7. 토스트 알림 함수
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // 초기 실행
+    updateUI();
+  </script>
+</body>
+</html>
